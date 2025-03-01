@@ -1,0 +1,4 @@
+a:hover, button:hover {
+    outline: 2px solid blue; /* Highlights the element */
+    cursor: pointer;
+}

@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "Hover Highlighter",
+    "version": "1.0",
+    "description": "Displays an icon when hovering over links and clickable elements.",
+    "icons": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "css": ["style.css"]
+      }
+    ],
+    "permissions": ["storage"],
+    "host_permissions": ["<all_urls>"]
+  }
+  
