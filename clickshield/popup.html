@@ -1,27 +1,218 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click Shield</title>
+    <title>ClickShield</title>
+    <script src="popup.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; padding: 10px; width: 300px; }
-        h3 { text-align: center; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #0056b3; }
-        #status { text-align: center; margin-top: 10px; }
-        .safe { color: green; }
-        .malicious { color: red; }
-        .undetected { color: orange; }
-        ul { padding: 0; list-style: none; }
-        li { padding: 5px; border-bottom: 1px solid #ccc; }
+        body {
+            font-family: Arial, sans-serif;
+            width: 350px;
+            padding: 15px;
+            margin: 0;
+            background-color: #818181; 
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .logo {
+            width: 45px;
+            height: 45px;
+            margin-right: 10px;
+        }
+        .title {
+            font-size: 25px;
+            font-weight: bold;
+            font-family: 'Rubik', sans-serif;
+            color: #ffffff;
+        }
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px; 
+        }
+        #searchInput {
+            width: 80%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #searchButton {
+            padding: 10px 12px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .secondary-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        .action-button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .secondary-button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #scanButton {
+            font-size: 15px;
+            background-color: #45b649;
+            color: white;
+            margin-bottom: 5px;
+        }
+        #generateReport {
+            background-color: #ff9800;
+            color: white;
+        }
+        #blockMalicious {
+            background-color: #f44336;
+            color: white;
+        }
+        #stats-container {
+            background-color: #f5f5f5;
+            padding: 18px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 18px;
+        }
+        .stats-header {
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .stats-label {
+            font-weight: 400;
+        }
+        .stats-value {
+            font-weight: 600;
+        }
+        .graph-container {
+            height: 300px;  /* Adjust the height to your preferred value */
+            max-height: 300px;  /* Ensure the container has a max height */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            background-color: #f9f9f9;
+            padding: 10px;
+            overflow-y: auto;  /* Enable vertical scrolling */
+        }
+        #results {
+            overflow-y: auto; /* Allow scrolling inside results if needed */
+            flex-grow: 1;  /* Allow the results div to take up remaining space */
+        }
+        #output {
+            border: 1px solid #ddd;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        /* Styling for categorized link sections */
+        .link-category-container {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            background-color: #f5f5f5;
+        }
+        h4 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: #fff;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .safe {
+            background-color: #4caf50; /* Safe - Green */
+        }
+        .undetected {
+            background-color: #ffeb3b; /* Undetected - Yellow */
+        }
+        .malicious {
+            background-color: #f44336; /* Malicious - Red */
+        }
     </style>
 </head>
 <body>
-    <h3>Click Shield</h3>
-    <button id="scanButton">Scan Page</button>
-    <p id="status">Click "Scan Page" to check links.</p>
-    <ul id="results"></ul>
-    <script src="popup.js"></script>
+    <div class="header">
+        <img src="icon.png" alt="Link Scanner Logo" class="logo">
+        <div class="title">ClickShield</div>
+    </div>  
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Enter URL to check...">
+        <button id="searchButton">Check</button>
+    </div>
+    
+    <div class="button-container">
+        <button id="scanButton" class="action-button">Auto Scan Links</button>
+        <div class="secondary-buttons">
+            <button id="generateReport" class="secondary-button">Generate Report</button>
+            <button id="blockMalicious" class="secondary-button">Block Malicious Links</button>
+        </div>
+    </div>
+    
+    <div id="stats-container"></div>
+
+    <div class="graph-container">
+        <div id="status"></div>
+        
+        <!-- Categorized Links Containers -->
+        <div id="malicious-links-container" class="link-category-container">
+            <h4>Malicious Links:</h4>
+            <ul id="malicious-links"></ul>
+        </div>
+        
+        <div id="safe-links-container" class="link-category-container">
+            <h4>Safe Links:</h4>
+            <ul id="safe-links"></ul>
+        </div>
+        
+        <div id="undetected-links-container" class="link-category-container">
+            <h4>Undetected Links:</h4>
+            <ul id="undetected-links"></ul>
+        </div>
+    </div>
+    
+    <pre id="output"></pre>
 </body>
 </html>

@@ -1,6 +1,6 @@
 document.getElementById("scanButton").addEventListener("click", () => {
     document.getElementById("status").innerText = "Scanning...";
-    document.getElementById("results").innerHTML = "";
+
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.scripting.executeScript({
@@ -49,13 +49,13 @@ function extractLinksAndClickables() {
 }
 
 function displayResults(results) {
-    let resultsList = document.getElementById("results");
+    // Update the status
     document.getElementById("status").innerText = "Scan Completed";
     console.log(results);
 
     // Display Summary Section
     if (results.Summary) {
-        let summarySection = document.createElement("div");
+        let summarySection = document.getElementById("stats-container");
         summarySection.innerHTML = `
             <h4>Scan Summary</h4>
             <p><strong>Total Links:</strong> ${results.Summary["Total Links"]}</p>
@@ -64,24 +64,24 @@ function displayResults(results) {
             <p><strong>Malicious Count:</strong> ${results.Summary["Malicious Count"]}</p>
             <hr>
         `;
-        resultsList.appendChild(summarySection);
     }
 
-    // Display Categorized Links
+    // Clear previous lists before adding new ones
+    document.getElementById("safe-links").innerHTML = '';
+    document.getElementById("undetected-links").innerHTML = '';
+    document.getElementById("malicious-links").innerHTML = '';
+
+    // Categorize and Display Links in their respective sections
     ["Safe", "Undetected", "Malicious"].forEach(category => {
         if (results[category].length > 0) {
-            let header = document.createElement("h4");
-            header.innerText = `${category} Links:`;
-            header.classList.add(category.toLowerCase());
-            resultsList.appendChild(header);
-
+            let container = document.getElementById(`${category.toLowerCase()}-links`);
             results[category].forEach(item => {
                 let listItem = document.createElement("li");
                 listItem.innerHTML = `<a href="${item.URL}" target="_blank">${item.URL}</a>`;
-                listItem.classList.add(category.toLowerCase());
-                resultsList.appendChild(listItem);
+                container.appendChild(listItem);
             });
         }
     });
 }
+
 
