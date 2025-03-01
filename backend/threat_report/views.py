@@ -56,10 +56,10 @@ def fetch_links(request):
                     results.append({'link': link, 'status': 'no direct link'})
 
             # Process the results and send to another function
-            process_results(safe_links, virustotal_responses)
-
+            output = process_results(safe_links, virustotal_responses)
+            print("Output:", output)
             # print(results)
-            return JsonResponse({'status': 'success', 'results': results})
+            return JsonResponse({'status': 'success', 'results': output})
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     else:
@@ -97,7 +97,56 @@ def check_with_virustotal(link):
         return None
 
 def process_results(safe_links, virustotal_responses):
-    # Implement your logic to process the safe links and VirusTotal responses
-    print("Safe Links:", safe_links)
-    print("VirusTotal Responses:", virustotal_responses)
-    # You can send these lists to the frontend or perform other actions as needed
+    safe = []
+    undetected = []
+    malicious = []
+
+    for link in safe_links:
+        safe.append({
+            "URL": link,
+            "Malicious Count": 0,
+            "Harmless Count": 0,
+            "Undetected Count": 0,
+            "User Votes Malicious": 0,
+            "User Votes Harmless": 0,
+            "Reputation Score": 0
+        })
+
+    for response in virustotal_responses:
+        attributes = response["data"]["attributes"]
+        link = attributes["url"]
+        malicious_count = attributes["last_analysis_stats"]["malicious"]
+        harmless_count = attributes["last_analysis_stats"]["harmless"]
+        undetected_count = attributes["last_analysis_stats"]["undetected"]
+        user_votes_malicious = attributes["total_votes"]["malicious"]
+        user_votes_harmless = attributes["total_votes"]["harmless"]
+        reputation_score = attributes.get("reputation", 0)
+
+        link_info = {
+            "URL": link,
+            "Malicious Count": malicious_count,
+            "Harmless Count": harmless_count,
+            "Undetected Count": undetected_count,
+            "User Votes Malicious": user_votes_malicious,
+            "User Votes Harmless": user_votes_harmless,
+            "Reputation Score": reputation_score
+        }
+
+        if malicious_count > 0:
+            malicious.append(link_info)
+        else:
+            safe.append(link_info)
+
+    summary = {
+        "Total Links": len(safe_links) + len(virustotal_responses),
+        "Safe Count": len(safe),
+        "Undetected Count": len(undetected),
+        "Malicious Count": len(malicious)
+    }
+
+    return {
+        "Safe": safe,
+        "Undetected": undetected,
+        "Malicious": malicious,
+        "Summary": summary
+    }
