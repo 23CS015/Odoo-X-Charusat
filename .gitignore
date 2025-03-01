@@ -1,6 +1,5 @@
-# Ignore compiled Python files
+# Ignore Python cache files
 __pycache__/
 *.pyc
-
-# Ignore Git-related files
-.gitignore
+*.pyo
+*.pyd

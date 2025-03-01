@@ -1,7 +1,6 @@
 document.getElementById("scanButton").addEventListener("click", () => {
     document.getElementById("status").innerText = "Scanning...";
-
-
+    
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.scripting.executeScript({
             target: { tabId: tabs[0].id },
@@ -33,6 +32,28 @@ document.getElementById("scanButton").addEventListener("click", () => {
     });
 });
 
+// Function to manually check a URL
+document.getElementById("searchButton").addEventListener("click", () => {
+    let urlToCheck = document.getElementById("searchInput").value.trim();
+
+    if (!urlToCheck) {
+        alert("Please enter a URL.");
+        return;
+    }
+
+    let apiUrl = `http://127.0.0.1:8000/check-link/?url=${encodeURIComponent(urlToCheck)}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            displayManualCheckResults(data);
+        })
+        .catch(error => {
+            console.error("Error checking URL:", error);
+            document.getElementById("manual-check-results").innerHTML = "<p style='color: red;'>Failed to fetch results. Please try again.</p>";
+        });
+});
+
 function extractLinksAndClickables() {
     let elements = document.querySelectorAll("a, button, input[type=submit], [onclick]");
     let extractedData = [];
@@ -49,7 +70,6 @@ function extractLinksAndClickables() {
 }
 
 function displayResults(results) {
-    // Update the status
     document.getElementById("status").innerText = "Scan Completed";
     console.log(results);
 
@@ -84,4 +104,29 @@ function displayResults(results) {
     });
 }
 
+// Function to display manual check results
+function displayManualCheckResults(data) {
+    let resultsContainer = document.getElementById("manual-check-results");
+    resultsContainer.innerHTML = "";
 
+    if (data.status === "error") {
+        resultsContainer.innerHTML = `<p style="color: red;">${data.message}</p>`;
+        return;
+    }
+
+    let reportHtml = `
+        <div class="link-category-container">
+            <h4>Manual Check Report</h4>
+            <p><strong>URL:</strong> ${data.URL}</p>
+            <p><strong>Threat Level:</strong> <span class="${data.threat_level.toLowerCase()}">${data.threat_level}</span></p>
+            <p><strong>Malicious Count:</strong> ${data["Malicious Count"]}</p>
+            <p><strong>Harmless Count:</strong> ${data["Harmless Count"]}</p>
+            <p><strong>Undetected Count:</strong> ${data["Undetected Count"]}</p>
+            <p><strong>User Votes (Malicious):</strong> ${data["User Votes Malicious"]}</p>
+            <p><strong>User Votes (Harmless):</strong> ${data["User Votes Harmless"]}</p>
+            <p><strong>Reputation Score:</strong> ${data["Reputation Score"]}</p>
+        </div>
+    `;
+
+    resultsContainer.innerHTML = reportHtml;
+}

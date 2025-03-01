@@ -21,4 +21,5 @@ from threat_report import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('fetch-links/', views.fetch_links, name='fetch_links'),
+    path('check-link/', views.check_link, name='check_link'),
 ]

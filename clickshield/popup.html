@@ -101,20 +101,9 @@
             font-size: 20px;
             margin-bottom: 12px;
         }
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        .stats-label {
-            font-weight: 400;
-        }
-        .stats-value {
-            font-weight: 600;
-        }
         .graph-container {
-            height: 300px;  /* Adjust the height to your preferred value */
-            max-height: 300px;  /* Ensure the container has a max height */
+            height: 300px;
+            max-height: 300px;
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-bottom: 15px;
@@ -122,11 +111,11 @@
             flex-direction: column;
             background-color: #f9f9f9;
             padding: 10px;
-            overflow-y: auto;  /* Enable vertical scrolling */
+            overflow-y: auto;
         }
         #results {
-            overflow-y: auto; /* Allow scrolling inside results if needed */
-            flex-grow: 1;  /* Allow the results div to take up remaining space */
+            overflow-y: auto;
+            flex-grow: 1;
         }
         #output {
             border: 1px solid #ddd;
@@ -135,8 +124,6 @@
             overflow-y: auto;
             background-color: #f9f9f9;
         }
-
-        /* Styling for categorized link sections */
         .link-category-container {
             margin-top: 15px;
             padding: 10px;
@@ -162,13 +149,13 @@
             border: 1px solid #ddd;
         }
         .safe {
-            background-color: #4caf50; /* Safe - Green */
+            background-color: #4caf50;
         }
         .undetected {
-            background-color: #ffeb3b; /* Undetected - Yellow */
+            background-color: #ffeb3b;
         }
         .malicious {
-            background-color: #f44336; /* Malicious - Red */
+            background-color: #f44336;
         }
     </style>
 </head>
@@ -178,11 +165,14 @@
         <div class="title">ClickShield</div>
     </div>  
     
+    <!-- Manual URL Check -->
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Enter URL to check...">
         <button id="searchButton">Check</button>
     </div>
-    
+    <div id="manual-check-results" class="link-category-container"></div>
+
+    <!-- Auto Scan Section -->
     <div class="button-container">
         <button id="scanButton" class="action-button">Auto Scan Links</button>
         <div class="secondary-buttons">
