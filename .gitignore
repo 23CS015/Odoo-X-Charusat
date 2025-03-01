@@ -1,2 +1,6 @@
-.env
+# Ignore compiled Python files
 __pycache__/
+*.pyc
+
+# Ignore Git-related files
+.gitignore
