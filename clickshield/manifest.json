@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "Click Shield",
+    "version": "1.0",
+    "description": "Scans and extracts all active links and clickable elements from a webpage.",
+    "permissions": ["scripting", "activeTab", "tabs"],
+    "host_permissions": ["https://webhook.site/*", "http://127.0.0.1:8000/*"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "icon.png"
+    }
+}
