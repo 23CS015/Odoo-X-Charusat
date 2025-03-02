@@ -24,6 +24,7 @@ document.getElementById("scanButton").addEventListener("click", () => {
 
                 if (response && response.status === "success") {
                     displayResults(response.results);
+                    storeScanResults(response.results);  // Store scan results in local cache
                 } else {
                     document.getElementById("status").innerText = "Error fetching scan results.";
                 }
@@ -47,6 +48,7 @@ document.getElementById("searchButton").addEventListener("click", () => {
         .then(response => response.json())
         .then(data => {
             displayManualCheckResults(data);
+            storeManualCheckResult(urlToCheck, data);  // Store manual check result in local cache
         })
         .catch(error => {
             console.error("Error checking URL:", error);
@@ -54,6 +56,7 @@ document.getElementById("searchButton").addEventListener("click", () => {
         });
 });
 
+// Function to extract links
 function extractLinksAndClickables() {
     let elements = document.querySelectorAll("a, button, input[type=submit], [onclick]");
     let extractedData = [];
@@ -69,6 +72,26 @@ function extractLinksAndClickables() {
     return extractedData;
 }
 
+// Function to store automatic scan results in local storage
+function storeScanResults(results) {
+    chrome.storage.local.set({ autoScanResults: results }, () => {
+        console.log("Automatic scan results cached successfully.");
+    });
+}
+
+// Function to store manual check results in local storage
+function storeManualCheckResult(url, data) {
+    chrome.storage.local.get("manualCheckResults", (result) => {
+        let storedResults = result.manualCheckResults || {};
+        storedResults[url] = data;  // Store result with the URL as the key
+
+        chrome.storage.local.set({ manualCheckResults: storedResults }, () => {
+            console.log(`Manual check result for ${url} cached successfully.`);
+        });
+    });
+}
+
+// Function to display scan results
 function displayResults(results) {
     document.getElementById("status").innerText = "Scan Completed";
     console.log(results);
@@ -130,3 +153,35 @@ function displayManualCheckResults(data) {
 
     resultsContainer.innerHTML = reportHtml;
 }
+
+// Load cached scan results when the popup opens
+document.addEventListener("DOMContentLoaded", () => {
+    chrome.storage.local.get("autoScanResults", (data) => {
+        if (data.autoScanResults) {
+            console.log("Loaded cached automatic scan results:", data.autoScanResults);
+            displayResults(data.autoScanResults);
+        } else {
+            document.getElementById("status").innerText = "No cached scan results found.";
+        }
+    });
+
+    chrome.storage.local.get("manualCheckResults", (data) => {
+        let resultsContainer = document.getElementById("manual-check-results");
+        resultsContainer.innerHTML = "";
+
+        if (!data.manualCheckResults || Object.keys(data.manualCheckResults).length === 0) {
+            resultsContainer.innerHTML = "<p>No cached manual checks found.</p>";
+            return;
+        }
+
+        Object.entries(data.manualCheckResults).forEach(([url, result]) => {
+            let resultItem = document.createElement("div");
+            resultItem.innerHTML = `
+                <p><strong>URL:</strong> ${url}</p>
+                <p><strong>Threat Level:</strong> ${result.threat_level}</p>
+                <hr>
+            `;
+            resultsContainer.appendChild(resultItem);
+        });
+    });
+});
